@@ -816,12 +816,12 @@ class Game:
                                 pygame.mixer.music.unpause()
                             self.draw_levels()
                 if event.type == pygame.KEYDOWN:
-                    if event.key == pygame.K_UP:
+                    if event.key == pygame.K_UP and self.jump_test(pl2):
                         pygame.time.set_timer(water_jumping_start, 650)
                         if not self.cnt_flag:
                             jump.play()
                         pl2.jump_flag = True
-                    if event.key == pygame.K_w:
+                    if event.key == pygame.K_w and self.jump_test(pl1):
                         pygame.time.set_timer(fire_jumping_start, 650)
                         if not self.cnt_flag:
                             jump.play()
@@ -918,6 +918,20 @@ class Game:
                 screen.blit(setting_image, (920, 10))
                 pygame.display.flip()
                 clock.tick(fps)
+
+    def jump_test(self, hero):
+        if pygame.sprite.spritecollideany(hero, platforms) or \
+                pygame.sprite.spritecollideany(hero, bars) or \
+                pygame.sprite.spritecollideany(hero, btns) or \
+                pygame.sprite.spritecollideany(hero, boxes) or \
+                pygame.sprite.spritecollideany(hero, lava) or \
+                pygame.sprite.spritecollideany(hero, water) or \
+                pygame.sprite.spritecollideany(hero, poison) or \
+                pygame.sprite.spritecollideany(hero, red_portal) or \
+                pygame.sprite.spritecollideany(hero, blue_portal):
+            return True
+        else:
+            return False
 
     def bar_move(self):
         for block in buttons:

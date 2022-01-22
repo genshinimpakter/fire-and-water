@@ -106,6 +106,7 @@ class Heroes(pygame.sprite.Sprite):
         self.in_portal = False
         self.on_button = False
         self.lose = False
+        self.govne = True
         # self.is_win = False
         self.under_bar = False
         self.music_flag = True
@@ -135,6 +136,11 @@ class Heroes(pygame.sprite.Sprite):
 
     # гравитация
     def update(self):
+        if self.under_bar and self.govne:
+            self.rect = self.rect.move(0, -1)
+            self.govne = False
+        elif not self.under_bar and not self.govne:
+            self.govne = True
         if not pygame.sprite.spritecollideany(self, platforms) \
                 and not pygame.sprite.spritecollideany(self, boxes) and not \
                 pygame.sprite.spritecollideany(self, bars) and not pygame.sprite.spritecollideany(self, btns) \
@@ -143,7 +149,8 @@ class Heroes(pygame.sprite.Sprite):
         for block in barriers:
             for bar in block:
                 if pygame.sprite.collide_mask(self, bar) and not bar.bar_max and \
-                        (pl1.on_button or pl2.on_button or box1.on_button) and not self.under_bar:
+                        (pl1.on_button or pl2.on_button or box1.on_button) and not \
+                        self.under_bar:
                     self.rect = self.rect.move(0, - 120 / fps)
                     break
         if (self.hero == "fire" and pygame.sprite.spritecollideany(self, red_portal)) or \
@@ -280,10 +287,11 @@ class Barrier(pygame.sprite.Sprite):
         all_sprites.add(self)
         self.mask = pygame.mask.from_surface(self.image)
         self.bar_max = False
-        self.move_down = False
+        self.down_motion = False
 
     # подъем вверх
     def up(self):
+        self.down_motion = False
         if self.rect.y > self.start_rect - 120:
             self.rect.y -= 120 / fps
             self.bar_max = False
@@ -292,11 +300,10 @@ class Barrier(pygame.sprite.Sprite):
 
     # подъем вниз
     def down(self):
-        if self.rect.y < self.start_rect:
-            self.rect.y += 120 / fps
-            self.move_down = True
-        else:
-            self.move_down = False
+        if not (pl1.under_bar and pl2.under_bar):
+            self.down_motion = True
+            if self.rect.y < self.start_rect:
+                self.rect.y += 120 / fps
 
 
 # Создание кнопки, активирующей движения барера
@@ -450,6 +457,7 @@ class Game:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     pygame.quit()
+                    exit()
                 if event.type == pygame.MOUSEMOTION:
                     x, y = event.pos
                     if 100 <= x <= 300 and 290 <= y <= 490:
@@ -590,6 +598,7 @@ class Game:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     pygame.quit()
+                    exit()
                 if event.type == pygame.MOUSEMOTION:
                     x, y = event.pos
                     if 900 <= x <= 975 and 25 <= y <= 100:
@@ -635,6 +644,7 @@ class Game:
         while run:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
+                    pygame.quit()
                     exit()
                 if event.type == pygame.MOUSEBUTTONDOWN:
                     x, y = event.pos
@@ -751,6 +761,7 @@ class Game:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     pygame.quit()
+                    exit()
                 if event.type == pygame.MOUSEMOTION:
                     x, y = event.pos
                     if not (self.final_screen_win or self.final_screen_lose):
@@ -866,6 +877,7 @@ class Game:
             if pl2.jump_flag and not pl2.under_bar:
                 pl2.jump()
             if pl1.on_button or pl2.on_button or box1.on_button:
+                pl1.under_bar, pl2.under_bar = False, False
                 ind = []
                 for i in [pl1, pl2, box1]:
                     if i.index[0] != -100 and i.index not in ind:
@@ -938,11 +950,16 @@ class Game:
             for btn in block:
                 btn.up()
         for block in barriers:
+            s = []
             for bar in block:
-                if pygame.sprite.collide_mask(bar, pl1) and bar.move_down:
+                s.append(bar.rect.y)
+            for bar in block:
+                if pygame.sprite.collide_mask(bar, pl1) and \
+                        pl1.rect.y + 40 >= max(s) + 24 >= pl1.rect.y and bar.down_motion:
                     pl1.under_bar = True
                     return
-                elif pygame.sprite.collide_mask(bar, pl2) and bar.move_down:
+                elif pygame.sprite.collide_mask(bar, pl2) and \
+                        pl2.rect.y + 40 >= max(s) + 24 >= pl2.rect.y and bar.down_motion:
                     pl2.under_bar = True
                     return
                 else:

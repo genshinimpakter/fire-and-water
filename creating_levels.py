@@ -293,6 +293,7 @@ class Level:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     pygame.quit()
+                    exit()
                 if event.type == pygame.MOUSEMOTION:
                     x, y = event.pos
                     if 80 <= x <= 230 and 490 <= y <= 640:
@@ -397,6 +398,7 @@ class Level:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     pygame.quit()
+                    exit()
                 if event.type == pygame.MOUSEMOTION:
                     x, y = event.pos
                     if 900 <= x <= 975 and 25 <= y <= 100:
@@ -620,6 +622,7 @@ class Level:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     pygame.quit()
+                    exit()
                 if event.type == pygame.MOUSEBUTTONDOWN:
                     if name.cr_btn and event.button == 3:
                         name.flag_end = True

@@ -106,7 +106,6 @@ class Heroes(pygame.sprite.Sprite):
         self.in_portal = False
         self.on_button = False
         self.lose = False
-        self.govne = True
         # self.is_win = False
         self.under_bar = False
         self.music_flag = True
@@ -136,11 +135,6 @@ class Heroes(pygame.sprite.Sprite):
 
     # гравитация
     def update(self):
-        if self.under_bar and self.govne:
-            self.rect = self.rect.move(0, -1)
-            self.govne = False
-        elif not self.under_bar and not self.govne:
-            self.govne = True
         if not pygame.sprite.spritecollideany(self, platforms) \
                 and not pygame.sprite.spritecollideany(self, boxes) and not \
                 pygame.sprite.spritecollideany(self, bars) and not pygame.sprite.spritecollideany(self, btns) \

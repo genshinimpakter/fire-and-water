@@ -361,6 +361,7 @@ class Liquids(pygame.sprite.Sprite):
 # загрузка уровня
 class Game:
     def __init__(self, name):
+        self.fon = ''
         self.name = name
         self.running = True
         self.cnt_flag = 0
@@ -448,7 +449,7 @@ class Game:
         while run:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
-                    exit()
+                    pygame.quit()
                 if event.type == pygame.MOUSEMOTION:
                     x, y = event.pos
                     if 100 <= x <= 300 and 290 <= y <= 490:
@@ -664,7 +665,9 @@ class Game:
         font = pygame.font.SysFont('Segoe Print', 30)
         with open("levels_info.json") as f2:
             name = json.load(f2)["current_level"]
-            level_text = font.render(f'Уровень {name.split("/")[1][0]}', True, (255, 255, 255))
+            num = name.split('/')[1][:name.split('/')[1].index('.')]
+            level_text = font.render(f"Уровень {num}", True, (255, 255, 255))
+            self.fon = pygame.transform.scale(pygame.image.load(f'caves/{num}.jpg'), (926, 720))
             screen.blit(level_text, (20, 10))
             with open(name) as f:
                 rows = f.readlines()
@@ -725,7 +728,6 @@ class Game:
         font = pygame.font.SysFont('Segoe Print', 30)
         level_text = font.render('Уровень 1', True, (255, 255, 255))
         screen.blit(level_text, (20, 10))
-        fon = pygame.transform.scale(load_image('fon_for_game.png'), (926, 720))
         anim = pygame.USEREVENT + 3
         pygame.time.set_timer(anim, 100)
         if "main" not in self.name:
@@ -748,7 +750,7 @@ class Game:
                 self.new_lvl = False
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
-                    exit()
+                    pygame.quit()
                 if event.type == pygame.MOUSEMOTION:
                     x, y = event.pos
                     if not (self.final_screen_win or self.final_screen_lose):
@@ -792,9 +794,9 @@ class Game:
                             self.new_lvl = True
                             with open("levels_info.json") as f:
                                 data = json.load(f)
-                                data2 = data["current_level"].split("/")
-                                data["current_level"] = data2[0] \
-                                                            + '/' + str(int(data2[1][0]) + 1) + ".txt"
+                                text = data["current_level"]
+                                num = int(text[text.index('/') + 1:text.index('.')])
+                                data["current_level"] = f'main_levels/{num + 1}.txt'
                                 with open("levels_info.json", "w") as f2:
                                     json.dump(data, f2)
                     elif self.final_screen_lose:
@@ -908,7 +910,7 @@ class Game:
                 pygame.display.flip()
                 self.final_screen_win = True
             else:
-                screen.blit(fon, (44, 104))
+                screen.blit(self.fon, (44, 104))
                 all_sprites.update()
                 all_sprites.draw(screen)
                 setting_image = pygame.transform.scale(self.pause

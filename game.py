@@ -135,6 +135,8 @@ class Heroes(pygame.sprite.Sprite):
 
     # гравитация
     def update(self):
+        if self.rect.y >= 824:
+            self.lose = True
         if not pygame.sprite.spritecollideany(self, platforms) \
                 and not pygame.sprite.spritecollideany(self, boxes) and not \
                 pygame.sprite.spritecollideany(self, bars) and not pygame.sprite.spritecollideany(self, btns) \
@@ -174,15 +176,27 @@ class Heroes(pygame.sprite.Sprite):
     # движение вправо
     def right(self):
         self.rect = self.rect.move(4, -5)
-        if not pygame.sprite.spritecollideany(self, platforms) and not pygame.sprite.spritecollideany(self, bars):
+        box1.rect = box1.rect.move(0, -5)
+        if not pygame.sprite.spritecollideany(self, platforms) \
+                and not pygame.sprite.spritecollideany(self, bars) \
+                and not (pygame.sprite.spritecollideany(self, boxes)
+                         and abs(self.rect.y - box1.rect.y + 45) <= 5
+                         and pygame.sprite.spritecollideany(box1, platforms)):
             self.rect = self.rect.move(200 / fps, 0)
+        box1.rect = box1.rect.move(0, 5)
         self.rect = self.rect.move(-4, 5)
 
     # движение влево
     def left(self):
         self.rect = self.rect.move(-4, -5)
-        if not pygame.sprite.spritecollideany(self, platforms) and not pygame.sprite.spritecollideany(self, bars):
+        box1.rect = box1.rect.move(0, -5)
+        if not pygame.sprite.spritecollideany(self, platforms) \
+                and not pygame.sprite.spritecollideany(self, bars) \
+                and not (pygame.sprite.spritecollideany(self, boxes)
+                         and abs(self.rect.y - box1.rect.y + 45) <= 5
+                         and pygame.sprite.spritecollideany(box1, platforms)):
             self.rect = self.rect.move(-(200 / fps), 0)
+        box1.rect = box1.rect.move(0, 5)
         self.rect = self.rect.move(4, 5)
 
     # прыжок

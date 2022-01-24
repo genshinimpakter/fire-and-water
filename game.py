@@ -816,6 +816,8 @@ class Game:
                                 data["current_level"] = f'main_levels/{num + 1}.txt'
                                 with open("levels_info.json", "w") as f2:
                                     json.dump(data, f2)
+                                pl1.in_portal = False
+                                pl2.in_portal = False
                     elif self.final_screen_lose:
                         if 137 <= x <= 287 and 490 <= y <= 640:
                             death.stop()
@@ -945,9 +947,7 @@ class Game:
                 pygame.sprite.spritecollideany(hero, boxes) or \
                 pygame.sprite.spritecollideany(hero, lava) or \
                 pygame.sprite.spritecollideany(hero, water) or \
-                pygame.sprite.spritecollideany(hero, poison) or \
-                pygame.sprite.spritecollideany(hero, red_portal) or \
-                pygame.sprite.spritecollideany(hero, blue_portal):
+                pygame.sprite.spritecollideany(hero, poison):
             return True
         else:
             return False

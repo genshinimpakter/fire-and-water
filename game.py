@@ -18,9 +18,9 @@ pygame.mixer.music.play(-1)
 pygame.mixer.music.set_volume(0.1)
 jump = pygame.mixer.Sound("sounds/jump.ogg")
 jump.set_volume(0.5)
-death = pygame.mixer.Sound("sounds/death.ogg")
+death = pygame.mixer.Sound("sounds/death.wav")
 death.set_volume(0.5)
-win_end = pygame.mixer.Sound("sounds/win2.ogg")
+win_end = pygame.mixer.Sound("sounds/win.wav")
 win_end.set_volume(0.5)
 
 # работа с окном
@@ -158,8 +158,6 @@ class Heroes(pygame.sprite.Sprite):
                 self.hero == "water" and pygame.sprite.spritecollideany(self, lava) or \
                 pygame.sprite.spritecollideany(self, poison):
             self.lose = True
-            # if not self.music_flag:
-            #     death.play()
 
         for block in buttons_cords:
             for i, j in block:
@@ -820,17 +818,18 @@ class Game:
                                     json.dump(data, f2)
                     elif self.final_screen_lose:
                         if 137 <= x <= 287 and 490 <= y <= 640:
+                            death.stop()
                             if not sound_flag:
                                 pygame.mixer.music.unpause()
-                            death.stop()
                             return
                         elif 425 <= x <= 575 and 490 <= y <= 640:
+                            death.stop()
                             if not sound_flag:
                                 pygame.mixer.music.unpause()
                             self.final_screen_lose = False
                             self.new_lvl = True
                         elif 712 <= x <= 862 and 490 <= y <= 640:
-                            win_end.stop()
+                            death.stop()
                             if not sound_flag:
                                 pygame.mixer.music.unpause()
                             self.draw_levels()
@@ -910,15 +909,16 @@ class Game:
             pl2.music_flag = self.cnt_flag
             if pl1.lose or pl2.lose:
                 if not self.cnt_flag:
-                    death.play(fade_ms=100)
+                    death.set_volume(0.5)
+                    death.play()
                     pygame.mixer.music.pause()
                 self.create_btns_lose(['Попробуйте снова'])
                 pygame.display.flip()
                 self.final_screen_lose = True
             elif pl1.in_portal and pl2.in_portal:
                 if not self.cnt_flag:
-                    win_end.play(fade_ms=100)
-                    # win_end.set_volume(0)
+                    win_end.set_volume(0.5)
+                    win_end.play()
                     pygame.mixer.music.pause()
                 self.create_btns_win(["Mission completed", "respect+"])
                 with open("levels_info.json") as f1:
@@ -926,7 +926,6 @@ class Game:
                     data[f"level_{int(data['current_level'].split('/')[1][0]) + 1}"] = "opened"
                     with open("levels_info.json", "w") as f2:
                         json.dump(data, f2)
-
                 pygame.display.flip()
                 self.final_screen_win = True
             else:

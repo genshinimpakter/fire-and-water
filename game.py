@@ -99,7 +99,7 @@ class Heroes(pygame.sprite.Sprite):
             self.cut_sheet(load_image("water-sheet1.png", -1), 5, 2)
         self.cur_frame = 0
         self.image = self.frames[self.cur_frame]
-        self.image = pygame.transform.scale(self.image, (50, 80))
+        self.image = pygame.transform.scale(self.image, (48, 80))
         self.rect.x = x
         self.rect.y = y
         self.jump_flag = False

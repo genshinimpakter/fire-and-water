@@ -187,14 +187,14 @@ class Heroes(pygame.sprite.Sprite):
     # движение влево
     def left(self):
         self.rect = self.rect.move(-4, -5)
-        box1.rect = box1.rect.move(0, -5)
+        box1.rect = box1.rect.move(-4, -5)
         if not pygame.sprite.spritecollideany(self, platforms) \
                 and not pygame.sprite.spritecollideany(self, bars) \
                 and not (pygame.sprite.spritecollideany(self, boxes)
                          and abs(self.rect.y - box1.rect.y + 45) <= 5
                          and pygame.sprite.spritecollideany(box1, platforms)):
             self.rect = self.rect.move(-(200 / fps), 0)
-        box1.rect = box1.rect.move(0, 5)
+        box1.rect = box1.rect.move(4, 5)
         self.rect = self.rect.move(4, 5)
 
     # прыжок

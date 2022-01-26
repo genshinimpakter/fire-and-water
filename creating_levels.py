@@ -112,6 +112,7 @@ class Level:
 
     # загрузка поля из файлов
     def edit_board(self):
+        self.clear()
         try:
             name = prompt_file()
             if name:

@@ -911,7 +911,6 @@ class Game:
             pl2.music_flag = self.cnt_flag
             if pl1.lose or pl2.lose:
                 if not self.cnt_flag:
-                    death.set_volume(0.5)
                     death.play()
                     pygame.mixer.music.pause()
                 self.create_btns_lose(['Попробуйте снова'])
@@ -919,7 +918,6 @@ class Game:
                 self.final_screen_lose = True
             elif pl1.in_portal and pl2.in_portal:
                 if not self.cnt_flag:
-                    win_end.set_volume(0.5)
                     win_end.play()
                     pygame.mixer.music.pause()
                 self.create_btns_win(["Mission completed", "respect+"])

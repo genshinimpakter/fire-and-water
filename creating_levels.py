@@ -132,11 +132,11 @@ class Level:
                         barriers[self.counter] = block_bar
                         buttons[self.counter] = block_btn
         except FileNotFoundError as e:
-            print(e)
+            print(FileNotFoundError)
         except ValueError as e:
-            print(e)
+            print(ValueError)
         except UnicodeDecodeError as e:
-            print(e)
+            print(UnicodeDecodeError)
 
     # присваивает нейтральные цвета
     def default_color(self):
@@ -514,11 +514,11 @@ class Level:
                     return
             except IndexError:
                 for i in range(5):
-                    self.board[39 - i][y] = 'b'
-            if self.width - x <= 6:
+                    self.board[38 - i][y] = 'b'
+            if self.width - x <= 5:
                 barriers[cnt] = []
                 keys_for_btns[cnt] = key_for_bar
-                for num in range(1, 6):
+                for num in range(2, 7):
                     self.board[self.width - num][y] = 'b'
                     barriers[cnt].append((self.width - num, y))
             else:

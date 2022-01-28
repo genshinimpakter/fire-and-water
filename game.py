@@ -71,6 +71,9 @@ def load_image(s, key=None):
 
 
 PL = load_image("stone.png")
+lava_block = load_image('lava-block.png')
+water_block = load_image('water-block.png')
+poison_block = load_image('poison-block.png')
 
 
 # меню выбора файла из проводника
@@ -355,19 +358,24 @@ class Portal(pygame.sprite.Sprite):
 # жидкости
 class Liquids(pygame.sprite.Sprite):
     def __init__(self, x, y, type_of):
-        super().__init__()
+        super().__init__(all_sprites)
         if type_of == "lava":
+            self.image = lava_block
             self.add(lava)
+            self.add(lava)
+            self.image = lava_block
         elif type_of == "water":
+            self.image = water_block
             self.add(water)
-        elif type_of == "poison":
+            self.add(water)
+        else:
+            self.image = poison_block
             self.add(poison)
-        self.image = load_image(f"{type_of}-block.png", -1)
+            self.add(poison)
         self.image = pygame.transform.scale(self.image, (24, 12))
         self.rect = self.image.get_rect()
         self.rect.x = x
         self.rect.y = y
-        all_sprites.add(self)
         self.mask = pygame.mask.Mask(size=(self.rect.x, 12))
 
 
@@ -681,9 +689,12 @@ class Game:
         font = pygame.font.SysFont('Segoe Print', 30)
         with open("levels_info.json") as f2:
             name = json.load(f2)["current_level"]
-            num = name.split('/')[1][:name.split('/')[1].index('.')]
-            level_text = font.render(f"Уровень {num}", True, (255, 255, 255))
+            if 'user' not in name:
+                num = name.split('/')[1][:name.split('/')[1].index('.')]
+            else:
+                num = name[name.index('_') + 1:name.index('.')]
             self.fon = pygame.transform.scale(pygame.image.load(f'caves/{num}.jpg'), (926, 720))
+            level_text = font.render(f"Уровень {num}", True, (255, 255, 255))
             screen.blit(level_text, (20, 10))
             with open(name) as f:
                 rows = f.readlines()
@@ -711,20 +722,22 @@ class Game:
                     for j in range(len(rows[i])):
                         if rows[i][j] == "a":
                             Platform(20 + j * 24, 80 + i * 24)
-                        elif rows[i][j] == "d":
-                            Portal(20 + j * 24, 80 + i * 24, "red")
-                        elif rows[i][j] == "e":
-                            Portal(20 + j * 24, 80 + i * 24, "blue")
                         elif rows[i][j] in ["c", "f", "g", "h"]:
                             Platform(20 + j * 24, 92 + i * 24, True)
                             if rows[i][j] == 'c':
                                 Platform(20 + (j + 1) * 24, 92 + i * 24, True)
-                            elif rows[i][j] == "h":
-                                Liquids(20 + j * 24, 80 + i * 24, "poison")
-                            elif rows[i][j] == 'f':
-                                Liquids(20 + j * 24, 80 + i * 24, "water")
-                            elif rows[i][j] == "g":
-                                Liquids(20 + j * 24, 80 + i * 24, "lava")
+                            else:
+                                if rows[i][j] == "h":
+                                    name = "poison"
+                                elif rows[i][j] == 'f':
+                                    name = "water"
+                                else:
+                                    name = "lava"
+                                Liquids(20 + j * 24, 80 + i * 24, name)
+                        elif rows[i][j] == "d":
+                            Portal(20 + j * 24, 80 + i * 24, "red")
+                        elif rows[i][j] == "e":
+                            Portal(20 + j * 24, 80 + i * 24, "blue")
                 for i in range(len(rows[:rows.index('\n')])):
                     for j in range(len(rows[i])):
                         if rows[i][j] == "i":

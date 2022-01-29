@@ -186,7 +186,7 @@ class Level:
                 elif self.board[x][y] == 'k':
                     screen.blit(self.water, (x * 24 + 20, y * 24 + 48))
                     self.water_color = (0, 255, 0)
-                if self.board[x][y] in ['f', 'g', 'h']:
+                elif self.board[x][y] in ['f', 'g', 'h']:
                     screen.blit(self.stone, (x * 24 + 20, y * 24 + 48))
                     if self.board[x][y] == 'f':
                         screen.blit(self.water_block, (x * 24 + 20, y * 24 + 48))
@@ -194,6 +194,8 @@ class Level:
                         screen.blit(self.lava_block, (x * 24 + 20, y * 24 + 48))
                     elif self.board[x][y] == 'h':
                         screen.blit(self.poison_block, (x * 24 + 20, y * 24 + 48))
+                elif self.board[x][y] == 'z':
+                    screen.blit(self.stone, (x * 24 + 20, y * 24 + 48))
 
         for y in range(self.height):
             for x in range(self.width):
@@ -599,9 +601,9 @@ class Level:
 
     # обработка удаления барьера и кнопки
     def delete_barrier_button(self, coords):
-        for k in [barriers.keys(), buttons.keys()]:
-            for i in list(k):
-                if any(coords == k for k in barriers[i]):
+        for m in [barriers, buttons]:
+            for i in list(m.keys()):
+                if any(coords == k for k in m[i]):
                     for x, y in barriers[i]:
                         self.board[x][y] = "`"
                     for x, y in buttons[i]:

@@ -44,6 +44,8 @@ blue_portal = pygame.sprite.Group()
 water = pygame.sprite.Group()
 lava = pygame.sprite.Group()
 poison = pygame.sprite.Group()
+fake_bars = pygame.sprite.Group()
+fake_platforms = pygame.sprite.Group()
 water_jumping_start = pygame.USEREVENT + 1
 fire_jumping_start = pygame.USEREVENT + 2
 
@@ -149,7 +151,7 @@ class Heroes(pygame.sprite.Sprite):
             for bar in block:
                 if pygame.sprite.collide_mask(self, bar) and not bar.bar_max and \
                         (pl1.on_button or pl2.on_button or box1.on_button) and not \
-                        self.under_bar:
+                        self.under_bar and not bar.bar_min:
                     self.rect = self.rect.move(0, - 120 / fps)
                     break
         if (self.hero == "fire" and pygame.sprite.spritecollideany(self, red_portal)) or \
@@ -243,6 +245,12 @@ class Box(pygame.sprite.Sprite):
 
     # гравитация и коллизия
     def update(self):
+        for block in barriers:
+            for bar in block:
+                if pygame.sprite.collide_mask(self, bar) and not bar.bar_max and \
+                        (pl1.on_button or pl2.on_button or box1.on_button) and not bar.bar_min:
+                    self.rect = self.rect.move(0, - 120 / fps)
+                    break
         if not pygame.sprite.spritecollideany(self, platforms) and \
                 not pygame.sprite.spritecollideany(self, bars) and \
                 not pygame.sprite.spritecollideany(self, btns):
@@ -297,10 +305,12 @@ class Barrier(pygame.sprite.Sprite):
         self.mask = pygame.mask.from_surface(self.image)
         self.bar_max = False
         self.down_motion = False
+        self.bar_min = False
 
     # подъем вверх
     def up(self):
         self.down_motion = False
+        self.bar_min = False
         if self.rect.y > self.start_rect - 120:
             self.rect.y -= 120 / fps
             self.bar_max = False
@@ -311,8 +321,40 @@ class Barrier(pygame.sprite.Sprite):
     def down(self):
         if not (pl1.under_bar and pl2.under_bar):
             self.down_motion = True
+            self.bar_max = False
             if self.rect.y < self.start_rect:
                 self.rect.y += 120 / fps
+                self.bar_min = False
+            else:
+                self.bar_min = True
+
+
+class FakeBarrier(pygame.sprite.Sprite):
+    def __init__(self, x, y):
+        super().__init__(all_sprites)
+        self.add(fake_bars)
+        self.image = load_image("barrier.png")
+        self.image = pygame.transform.scale(self.image, (24, 24))
+        self.rect = self.image.get_rect()
+        self.start_rect = y
+        self.rect.x = x
+        self.rect.y = y
+        all_sprites.add(self)
+        self.mask = pygame.mask.from_surface(self.image)
+
+
+class FakePlatform(pygame.sprite.Sprite):
+    def __init__(self, x, y):
+        super().__init__(all_sprites)
+        self.add(fake_platforms)
+        self.image = PL
+        self.image = pygame.transform.scale(self.image, (24, 24))
+        self.rect = self.image.get_rect()
+        self.start_rect = y
+        self.rect.x = x
+        self.rect.y = y
+        all_sprites.add(self)
+        self.mask = pygame.mask.from_surface(self.image)
 
 
 # Создание кнопки, активирующей движения барера
@@ -352,6 +394,18 @@ class Portal(pygame.sprite.Sprite):
         self.rect.x = x
         self.rect.y = y
         all_sprites.add(self)
+        self.mask = pygame.mask.from_surface(self.image)
+
+
+class Final(pygame.sprite.Sprite):
+    def __init__(self, x, y):
+        super().__init__(all_sprites)
+        self.image = load_image('final.png', -1)
+        self.image = pygame.transform.scale(self.image, (96, 96))
+        self.rect = self.image.get_rect()
+        self.rect.x = x
+        self.rect.y = y
+        self.add(blue_portal), self.add(red_portal)
         self.mask = pygame.mask.from_surface(self.image)
 
 
@@ -455,6 +509,8 @@ class Game:
         barriers_cords.clear()
         barriers.clear()
         buttons.clear()
+        fake_platforms.empty()
+        fake_platforms.empty()
         self.final_screen_win = False
         self.final_screen_lose = False
 
@@ -738,6 +794,13 @@ class Game:
                             Portal(20 + j * 24, 80 + i * 24, "red")
                         elif rows[i][j] == "e":
                             Portal(20 + j * 24, 80 + i * 24, "blue")
+                        elif rows[i][j] == 'b' and all([True if (j, i) not in block else False
+                                                        for block in barriers_cords]):
+                            FakeBarrier(20 + j * 24, 80 + i * 24)
+                        elif rows[i][j] == 'z':
+                            FakePlatform(20 + j * 24, 80 + i * 24)
+                        elif rows[i][j] == 'm':
+                            Final(20 + j * 24, 80 + i * 24)
                 for i in range(len(rows[:rows.index('\n')])):
                     for j in range(len(rows[i])):
                         if rows[i][j] == "i":

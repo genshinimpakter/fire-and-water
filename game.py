@@ -450,6 +450,7 @@ class Game:
         self.new_lvl = True
         self.win = False
         self.death = False
+        self.final_win = False
         self.barriers_cords = []
         self.buttons_cords = []
         self.barriers = []
@@ -749,6 +750,8 @@ class Game:
                 num = name.split('/')[1][:name.split('/')[1].index('.')]
             else:
                 num = name[name.index('_') + 1:name.index('.')]
+            if num == '10':
+                self.final_win = True
             self.fon = pygame.transform.scale(pygame.image.load(f'caves/{num}.jpg'), (926, 720))
             level_text = font.render(f"Уровень {num}", True, (255, 255, 255))
             screen.blit(level_text, (20, 10))
@@ -985,11 +988,18 @@ class Game:
                 self.bar_move()
             pl1.music_flag = self.cnt_flag
             pl2.music_flag = self.cnt_flag
-            if pl1.lose or pl2.lose:
+            if self.final_win and pl1.in_portal and pl2.in_portal:
+                if not self.cnt_flag:
+                    win_end.play()
+                    pygame.mixer.music.pause()
+                self.create_btns_lose(['Ты потрясающий'])
+                pygame.display.flip()
+                self.final_screen_lose = True
+            elif pl1.lose or pl2.lose:
                 if not self.cnt_flag:
                     death.play()
                     pygame.mixer.music.pause()
-                self.create_btns_lose(['Попробуйте снова'])
+                self.create_btns_lose(['Попробуй снова'])
                 pygame.display.flip()
                 self.final_screen_lose = True
             elif pl1.in_portal and pl2.in_portal:
